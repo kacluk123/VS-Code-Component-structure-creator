@@ -26,7 +26,7 @@ exports.deactivate = exports.activate = void 0;
 const vscode = __webpack_require__(1);
 const regexp = /{{([_a-z\d]+)}}/gi;
 const createComponentPart = ({ url, wsedit, fileContent, fileName, componentName }) => __awaiter(void 0, void 0, void 0, function* () {
-    const path = `${url}\\${componentName}\\${fileName}`;
+    const path = `${url}/${componentName}/${fileName}`;
     const filePath = vscode.Uri.file(path);
     wsedit.createFile(filePath, { ignoreIfExists: true });
     yield vscode.workspace.applyEdit(wsedit);
@@ -42,7 +42,7 @@ const createComponentPart = ({ url, wsedit, fileContent, fileName, componentName
 });
 const replaceTemplateText = (file, componentName) => __awaiter(void 0, void 0, void 0, function* () {
     const document = yield vscode.workspace.openTextDocument(file);
-    const [fileNameWithoutTemplateExtension] = document.fileName.split('\\').reverse()[0].split('.template');
+    const [fileNameWithoutTemplateExtension] = document.uri.path.split('/').reverse()[0].split('.template');
     return {
         fileContent: document.getText().replace(regexp, componentName),
         fileName: fileNameWithoutTemplateExtension.replace(regexp, componentName)

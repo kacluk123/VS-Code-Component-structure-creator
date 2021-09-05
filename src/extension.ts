@@ -15,7 +15,7 @@ const createComponentPart = async ({
   componentName: string
   fileName: string,
 }) => {
-  const path = `${url}\\${componentName}\\${fileName}`
+  const path = `${url}/${componentName}/${fileName}`
   const filePath = vscode.Uri.file(path);
   wsedit.createFile(filePath, { ignoreIfExists: true });
   await vscode.workspace.applyEdit(wsedit);
@@ -32,7 +32,7 @@ const createComponentPart = async ({
 
 const replaceTemplateText = async (file: vscode.Uri, componentName: string) => {
   const document = await vscode.workspace.openTextDocument(file)
-  const [ fileNameWithoutTemplateExtension ] = document.fileName.split('\\').reverse()[0].split('.template')
+  const [ fileNameWithoutTemplateExtension ] = document.uri.path.split('/').reverse()[0].split('.template')
 
   return {
     fileContent: document.getText().replace(regexp, componentName),
