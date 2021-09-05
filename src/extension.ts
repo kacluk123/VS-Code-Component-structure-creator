@@ -45,7 +45,7 @@ const getTemplates = async (componentName: string) => {
 
   const promises = templates.map(document => replaceTemplateText(document, componentName))
 
-  return Promise.all(promises)
+  return promises
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -69,13 +69,14 @@ export function activate(context: vscode.ExtensionContext) {
         const wsedit = new vscode.WorkspaceEdit();
         const componentsParts = await getTemplates(value)
   
-        for await (const component of componentsParts) {
-          createComponentPart({
+        for (const component of componentsParts) {
+          const comp = await component
+          await createComponentPart({
             url: newUri._fsPath,
-            fileName: component.fileName,
+            fileName: comp.fileName,
             componentName: value,
             wsedit: wsedit,
-            fileContent: component.fileContent
+            fileContent: comp.fileContent
           })
         }
       };

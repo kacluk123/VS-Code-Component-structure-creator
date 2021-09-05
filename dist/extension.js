@@ -14,13 +14,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deactivate = exports.activate = void 0;
 const vscode = __webpack_require__(1);
@@ -51,7 +44,7 @@ const replaceTemplateText = (file, componentName) => __awaiter(void 0, void 0, v
 const getTemplates = (componentName) => __awaiter(void 0, void 0, void 0, function* () {
     const templates = yield vscode.workspace.findFiles('templates/*.template');
     const promises = templates.map(document => replaceTemplateText(document, componentName));
-    return Promise.all(promises);
+    return promises;
 });
 function activate(context) {
     let createFile = vscode.commands.registerCommand('file-creator.helloWorld', (folder) => __awaiter(this, void 0, void 0, function* () {
@@ -66,28 +59,18 @@ function activate(context) {
             placeHolder: "(placeholder)"
         };
         vscode.window.showInputBox(options).then((value) => __awaiter(this, void 0, void 0, function* () {
-            var e_1, _a;
             if (value) {
                 const wsedit = new vscode.WorkspaceEdit();
                 const componentsParts = yield getTemplates(value);
-                try {
-                    for (var componentsParts_1 = __asyncValues(componentsParts), componentsParts_1_1; componentsParts_1_1 = yield componentsParts_1.next(), !componentsParts_1_1.done;) {
-                        const component = componentsParts_1_1.value;
-                        createComponentPart({
-                            url: newUri._fsPath,
-                            fileName: component.fileName,
-                            componentName: value,
-                            wsedit: wsedit,
-                            fileContent: component.fileContent
-                        });
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (componentsParts_1_1 && !componentsParts_1_1.done && (_a = componentsParts_1.return)) yield _a.call(componentsParts_1);
-                    }
-                    finally { if (e_1) throw e_1.error; }
+                for (const component of componentsParts) {
+                    const comp = yield component;
+                    yield createComponentPart({
+                        url: newUri._fsPath,
+                        fileName: comp.fileName,
+                        componentName: value,
+                        wsedit: wsedit,
+                        fileContent: comp.fileContent
+                    });
                 }
             }
             ;
